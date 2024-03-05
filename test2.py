@@ -23,33 +23,33 @@ def main():
         unsafe_allow_html=True
     )
     
-    # Slider example
-    num = st.slider("Choose a number", 1, 10, key="slider")
-    st.write(st.session_state)
+    # # Slider example
+    # num = st.slider("Choose a number", 1, 10, key="slider")
+    # st.write(st.session_state)
 
     # Title and markdown examples
     st.title("Excel File Reader")
-    st.markdown("*Streamlit* is **really** ***cool***.")
-    st.markdown(':red[Streamlit] :orange[can] :green[write] :blue[text] :violet[in] :gray[pretty] :rainbow[colors].')
-    st.markdown("Here's a bouquet &mdash; :tulip::cherry_blossom::rose::hibiscus::sunflower::blossom:")
+    # st.markdown("*Streamlit* is **really** ***cool***.")
+    # st.markdown(':red[Streamlit] :orange[can] :green[write] :blue[text] :violet[in] :gray[pretty] :rainbow[colors].')
+    # st.markdown("Here's a bouquet &mdash; :tulip::cherry_blossom::rose::hibiscus::sunflower::blossom:")
 
-    # Multi-line markdown example
-    multi = '''
-        ### Hello welcome 
-        Today we will talk about 
-        2023-12-18
-        Expanded access to AI coding has arrived in Colab across 175 locales for all tiers of Colab users
-        Improvements to display of ML-based inline completions (for eligible Pro/Pro+ users)
-        Started a series of notebooks highlighting Gemini API capabilities
-        Enable ⌘/Ctrl+L to select the full line in an editor
-        Fixed bug where we weren't correctly formatting output from multiple execution results
-        * List item
-        ```
-        # This is formatted as code
-        ```
-        * List item
-    '''
-    st.markdown(multi)
+    # # Multi-line markdown example
+    # multi = '''
+    #     ### Hello welcome 
+    #     Today we will talk about 
+    #     2023-12-18
+    #     Expanded access to AI coding has arrived in Colab across 175 locales for all tiers of Colab users
+    #     Improvements to display of ML-based inline completions (for eligible Pro/Pro+ users)
+    #     Started a series of notebooks highlighting Gemini API capabilities
+    #     Enable ⌘/Ctrl+L to select the full line in an editor
+    #     Fixed bug where we weren't correctly formatting output from multiple execution results
+    #     * List item
+    #     ```
+    #     # This is formatted as code
+    #     ```
+    #     * List item
+    # '''
+    # st.markdown(multi)
 
     # Upload Excel file through Streamlit
     uploaded_file = st.file_uploader("Choose an Excel file", type=["xlsx", "xls"])
