@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import io
+import statistics
 
 # Define main function
 def main():
@@ -50,12 +51,12 @@ def main():
     </style>
     """, unsafe_allow_html=True)
 
-        selected_columns = st.multiselect("Select columns for value counts", list(df[sheet_option].columns))
+        selected_columns_value_counts = st.multiselect("Select columns for value counts", list(df[sheet_option].columns))
            
-        if selected_columns:
+        if selected_columns_value_counts:
             # Calculate value counts and percentage for each selected column
             main_value_counts_df = pd.DataFrame(columns=['Column', 'Value', 'Percentage', 'Count'])
-            for col in selected_columns:
+            for col in selected_columns_value_counts:
                 value_counts = df[sheet_option][col].value_counts()
                 total_rows = len(df[sheet_option])
                 percentage = (value_counts / total_rows) * 100
@@ -80,18 +81,53 @@ def main():
                 # Display value counts and percentage for the selected columns
                 st.write(f"Value Counts and Percentage for '{col}':")
                 st.write(col_value_counts_df)
-
         # Display value counts and percentage for all selected columns in a single DataFrame
-        if not main_value_counts_df.empty:
+        if 'main_value_counts_df' in locals() and not main_value_counts_df.empty:
             st.write("Value Counts and Percentage for All Selected Columns:")
             st.write(main_value_counts_df)
+        selected_columns_stats = st.multiselect("Select columns for statistics", list(df[sheet_option].columns))
+
+        if selected_columns_stats:
+            # Calculate mean, median, mode, and standard deviation for selected columns
+            main_stats_df = pd.DataFrame(columns=['Column', 'Mean', 'Median', 'Mode', 'Standard Deviation'])
+            for col in selected_columns_stats:
+                if df[sheet_option][col].dtype in ['int64', 'float64']:
+                    mean_val = df[sheet_option][col].mean()
+                    median_val = df[sheet_option][col].median()
+                    try:
+                        mode_val = statistics.mode(df[sheet_option][col])
+                    except statistics.StatisticsError:
+                        mode_val = "No unique mode"
+                    std_dev = df[sheet_option][col].std()
+
+                    # Create a DataFrame for the current column
+                    col_stats_df = pd.DataFrame({'Column': [col], 'Mean': [mean_val], 'Median': [median_val], 'Mode': [mode_val], 'Standard Deviation': [std_dev]})
+
+                    # Append the current column's DataFrame to the main DataFrame
+                    main_stats_df = pd.concat([main_stats_df, col_stats_df])
+
+                    # Display statistics for the selected columns
+                    st.write(f"Statistics for '{col}':")
+                    st.write(col_stats_df)
+                else:
+                    st.write(f"Statistics for '{col}' cannot be calculated as it is not a numerical column.")
+
+        
+
+        # Display statistics for all selected columns in a single DataFrame
+        if 'main_stats_df' in locals() and not main_stats_df.empty:
+            st.write("Statistics for All Selected Columns:")
+            st.write(main_stats_df)
 
             # Add a download button for the main DataFrame as Excel
             if st.button("Download as Excel"):
                 # Prepare the Excel file as binary data
                 excel_binary = io.BytesIO()
                 with pd.ExcelWriter(excel_binary, engine='openpyxl', mode='w') as writer:
-                    main_value_counts_df.to_excel(writer, sheet_name=sheet_option, index=False)
+                    if 'main_value_counts_df' in locals() and not main_value_counts_df.empty:
+                        main_value_counts_df.to_excel(writer, sheet_name=sheet_option + "_value_counts", index=False)
+                    if 'main_stats_df' in locals() and not main_stats_df.empty:
+                        main_stats_df.to_excel(writer, sheet_name=sheet_option + "_statistics", index=False)
 
                 # Trigger the download of the Excel file
                 st.download_button(label="Download Now", data=excel_binary, file_name=f"{uploaded_file.name}_{sheet_option}_output.xlsx", key="download_button")
