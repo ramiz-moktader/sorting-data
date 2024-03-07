@@ -81,11 +81,22 @@ def main():
                 # Display value counts and percentage for the selected columns
                 st.write(f"Value Counts and Percentage for '{col}':")
                 st.write(col_value_counts_df)
+
         # Display value counts and percentage for all selected columns in a single DataFrame
         if 'main_value_counts_df' in locals() and not main_value_counts_df.empty:
             st.write("Value Counts and Percentage for All Selected Columns:")
             st.write(main_value_counts_df)
-        selected_columns_stats = st.multiselect("Select columns for statistics", list(df[sheet_option].columns))
+
+        # Multiselect widget for binary columns
+        selected_binary_columns = st.multiselect("Select multiselect answer columns for analysis", list(df[sheet_option].columns), [])
+        binary_results_df = None
+        if selected_binary_columns:
+            # Calculate binary column analysis
+            binary_results_df = analyze_binary_columns(df[sheet_option].copy(), selected_binary_columns)
+            st.write("Binary Column Analysis:")
+            st.write(binary_results_df)
+
+        selected_columns_stats = st.multiselect("Select columns for statistics", list(df[sheet_option].columns), [])
 
         if selected_columns_stats:
             # Calculate mean, median, mode, and standard deviation for selected columns
@@ -112,8 +123,6 @@ def main():
                 else:
                     st.write(f"Statistics for '{col}' cannot be calculated as it is not a numerical column.")
 
-        
-
         # Display statistics for all selected columns in a single DataFrame
         if 'main_stats_df' in locals() and not main_stats_df.empty:
             st.write("Statistics for All Selected Columns:")
@@ -131,6 +140,19 @@ def main():
 
                 # Trigger the download of the Excel file
                 st.download_button(label="Download Now", data=excel_binary, file_name=f"{uploaded_file.name}_{sheet_option}_output.xlsx", key="download_button")
+
+# Function to analyze binary columns
+def analyze_binary_columns(df, selected_columns):
+    """Analyzes selected columns containing 1s, returning a DataFrame with frequencies and percentages."""
+    results_df = pd.DataFrame(columns=['Column', 'Value', 'Frequency', 'Percentage (%)'])
+
+    for col in selected_columns:
+        count_1s = df[col].sum()  # Count occurrences of 1
+        percentage = (count_1s / df.shape[0]) * 100
+        new_row = pd.DataFrame({'Column': [col], 'Value': [1], 'Frequency': [count_1s], 'Percentage (%)': [percentage]})
+        results_df = pd.concat([results_df, new_row], ignore_index=True)  # Use concat instead of append
+
+    return results_df
 
 # Call the main function
 if __name__ == "__main__":
