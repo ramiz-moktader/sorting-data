@@ -59,7 +59,9 @@ def main():
             for col in selected_columns_value_counts:
                 value_counts = df[sheet_option][col].value_counts()
                 total_rows = len(df[sheet_option])
-                percentage = (value_counts / total_rows) * 100
+                col_total = value_counts.values.sum()
+                percentage = (value_counts / col_total) * 100
+                # percentage = (value_counts / total_rows) * 100
 
                 # Create a DataFrame for the current column
                 col_value_counts_df = pd.DataFrame({'Value': value_counts.index, 'Percentage': percentage.values, 'Count': value_counts.values})
